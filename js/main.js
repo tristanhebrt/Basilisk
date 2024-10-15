@@ -50,32 +50,69 @@ spotLight.angle = 0.6;
 //*************************************************************************************
 
 // GLTF loader
+let model;
 const assetLoader = new GLTFLoader();
 assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
     const model = gltf.scene;
+    model.position.set(0, 0, 0);
     model.traverse(function(node) {
         if (node.isMesh) node.castShadow = true; //cast shadows
     });
+
     scene.add(model);
-    model.position.set(0, 0, 0);
+
 }, undefined, function(error) {
     console.error(error);
 });
 
 assetLoader.load('./assets/desk.glb', function(gltf) { //import desk asset
     const model = gltf.scene;
+    model.position.set(0, 0, 0);
     model.traverse(function(node) {
         if (node.isMesh) node.receiveShadow = true; //receive shadows
     });
+
     scene.add(model);
-    model.position.set(0, 0, 0);
+    
 }, undefined, function(error) {
     console.error(error);
 });
 
+// Get mouse position
+const mousePosition = new THREE.Vector2();
+window.addEventListener('mousemove', function(e) {
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = - (e.clientY / window.innerHeight) * 2 + 1;
+});
+
+// Variables to store camera rotation
+let yaw = 0; // Horizontal rotation
+let pitch = 0; // Vertical rotation
+
+// Sensitivity for camera rotation (adjust as needed)
+const sensitivityX = 0.7;
+const sensitivityY = 0.7;
+
+// Rotation limits for pitch (up/down)
+const maxPitch = 0.5; // 45 degrees up/down
+
 // Animate scene
 function animate() {
     requestAnimationFrame(animate);
+
+    // Calculate yaw and pitch based on mouse movement
+    yaw = -mousePosition.x * sensitivityX; // Invert for natural head motion
+    pitch = mousePosition.y * sensitivityY;
+
+    // Clamp pitch to avoid excessive up/down rotation
+    pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+
+    // Rotate the camera around the target point (0, 0, 0)
+    camera.rotation.order = 'YXZ'; // Use YXZ order for yaw/pitch rotation
+    camera.rotation.y = yaw; // Horizontal (yaw)
+    camera.rotation.x = pitch; // Vertical (pitch)
+
+    // Render scene with updated camera rotation
     renderer.render(scene, camera);
 }
 animate();
