@@ -122,29 +122,58 @@ function raycast() {
     }
 }
 
-// Event listener for mouse click
-window.addEventListener('click', function() {
-    if (hoveredObject && hoveredObject.name === "screen") {
-        console.log("Clicked on the screen!");
-        // Add any additional actions you want to perform on click
+let isZooming = false; // Flag to indicate if zooming is in progress
+const targetFOV = 1; // Target FOV for full zoom effect (black screen)
+const zoomSpeed = 0.01; // Speed of zooming (adjust for smoother or faster zoom)
+
+// Define the toMonitor function for smooth zooming
+function toMonitor() {
+    if (isZooming) return; // Prevent multiple zooming instances
+    isZooming = true; // Set zooming flag
+
+    const initialFOV = camera.fov; // Store the initial FOV
+    const zoomDirection = targetFOV - initialFOV; // Calculate zoom direction
+
+    // Create a function to handle the zooming
+    function zoom() {
+        // Check if we have reached the target FOV
+        if (Math.abs(camera.fov - targetFOV) < 0.1) {
+            camera.fov = targetFOV; // Snap to target FOV
+            camera.updateProjectionMatrix(); // Update the camera projection matrix
+            window.location.href = 'monitor.html'; // Open monitor.html
+            return; // Exit the zoom function
+        }
+
+        // Smoothly interpolate the camera's FOV towards the target FOV
+        camera.fov += zoomDirection * zoomSpeed; // Adjust camera's FOV based on zoom speed
+        camera.updateProjectionMatrix(); // Update the camera projection matrix
+
+        // Call zoom again on the next frame
+        requestAnimationFrame(zoom);
     }
-});
+
+    // Start the zoom animation
+    zoom();
+}
 
 // Animate scene
 function animate() {
     requestAnimationFrame(animate);
 
-    // Calculate yaw and pitch based on mouse movement
-    yaw = -mousePosition.x * sensitivityX; // Invert for natural head motion
-    pitch = mousePosition.y * sensitivityY;
+    // Check if zooming is not in progress
+    if (!isZooming) {
+        // Calculate yaw and pitch based on mouse movement
+        yaw = -mousePosition.x * sensitivityX; // Invert for natural head motion
+        pitch = mousePosition.y * sensitivityY;
 
-    // Clamp pitch to avoid excessive up/down rotation
-    pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+        // Clamp pitch to avoid excessive up/down rotation
+        pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
 
-    // Rotate the camera around the target point (0, 0, 0)
-    camera.rotation.order = 'YXZ'; // Use YXZ order for yaw/pitch rotation
-    camera.rotation.y = yaw; // Horizontal (yaw)
-    camera.rotation.x = pitch; // Vertical (pitch)
+        // Rotate the camera around the target point (0, 0, 0)
+        camera.rotation.order = 'YXZ'; // Use YXZ order for yaw/pitch rotation
+        camera.rotation.y = yaw; // Horizontal (yaw)
+        camera.rotation.x = pitch; // Vertical (pitch)
+    }
 
     // Perform raycasting to detect hovered objects
     raycast();
@@ -153,6 +182,15 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
+
+
+// Event listener for mouse click
+window.addEventListener('click', function() {
+    if (hoveredObject && hoveredObject.name === "screen") { //if the screen is clicked
+        console.log("Clicked on the screen!"); //DEBUG
+        toMonitor();
+    }
+});
 
 // Make scene resize on window resize
 window.addEventListener('resize', function() {
