@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight); //give the renderer a size
 document.body.appendChild(renderer.domElement); //add the renderer to the body
+renderer.shadowMap.enabled = true; //allow shadows
 
 // Create a scene
 const scene = new THREE.Scene();
@@ -41,6 +42,7 @@ scene.add(spotLight);
 
 spotLight.intensity = 1000;
 spotLight.position.set(0, 50, -3); //spot light position
+spotLight.castShadow = true;
 spotLight.angle = 0.6;
 
 //onst sLightHelper = new THREE.SpotLightHelper(spotLight); //HELPER
@@ -50,6 +52,9 @@ spotLight.angle = 0.6;
 // GLTF loader
 const assetLoader = new GLTFLoader();
 assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
+    const model = gltf.scene;
+    model.traverse(function(node) {
+        if (node.isMesh) node.castShadow = true; //cast shadows
     });
     scene.add(model);
     model.position.set(0, 0, 0);
@@ -59,6 +64,9 @@ assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
 
 assetLoader.load('./assets/desk.glb', function(gltf) { //import desk asset
     const model = gltf.scene;
+    model.traverse(function(node) {
+        if (node.isMesh) node.receiveShadow = true; //receive shadows
+    });
     scene.add(model);
     model.position.set(0, 0, 0);
 }, undefined, function(error) {
