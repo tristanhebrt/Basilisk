@@ -116,8 +116,12 @@ function raycast() {
 
     if (intersects.length > 0) {
         hoveredObject = intersects[0].object; // Store currently hovered object
+        if (hoveredObject.name == "screen") { // When hovering the screen
+            document.body.style.cursor = 'pointer'; // Turn cursor to pointer
+        }
         console.log("Hovering over:", hoveredObject.name || "Unnamed Object"); //DEBUG
     } else {
+        document.body.style.cursor = 'default'; // Turn cursor to default
         hoveredObject = null; // Reset hovered object if nothing is intersected
     }
 }
