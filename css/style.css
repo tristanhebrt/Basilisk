@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Pathway+Gothic+One&display=swap');
+
+body {
+    display: grid;
+    grid-template-areas:
+        "header"  /* Header area */
+        "main"    /* Main content area */
+        "footer"; /* Footer area */
+    background-color: rgb(150, 150, 150);
+    font-family: "Pathway Gothic One", sans-serif;
+    font-size: 20px;
+    margin: 0px;
+    margin: 0px;
+}
+
+/* Header ********************************************************************/
+header {
+    display: grid;
+    grid-template-rows: repeat(1, 1fr); /* Distribute items evenly */
+    grid-template-columns: repeat(2, 5fr); /* Distribute items evenly */
+    grid-area: header;
+    background-color: rgb(160, 160, 160);
+}
+
+#navBasilisk {
+    display: grid;
+    justify-content: left; /* Align content to the left */
+    align-items: center; /* Vertically center the content */
+}
+
+nav ol {
+    display: grid;
+    grid-column: 2;
+    
+    list-style: none;
+    justify-items: left; /* Center items horizontally */
+}
+
+nav ol li a {
+     color: rgb(0, 0, 0);
+     text-decoration: none;
+     text-transform: uppercase;
+     letter-spacing: 5px;
+     font-family: monospace;
+     font-family: "Pathway Gothic One", sans-serif;
+}
+
+nav ol li a p {
+    transition: transform 1s ease;
+}
+
+nav ol li img {
+    width: 300px;
+    transition: transform 1s ease;
+}
+
+nav ol li a p:hover {
+    transform: scale(1.5);
+}
+
+nav ol li img:hover {
+    transform: scale(1.1);
+}
+
+/* Main ********************************************************************/
+main {
+    grid-area: main;
+}
+
+/* Footer ********************************************************************/
+footer {
+    grid-area: footer;
+    background-color: rgb(160, 160, 160);
+}
