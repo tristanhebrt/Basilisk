@@ -49,14 +49,20 @@ spotLight.angle = 0.6;
 //scene.add(sLightHelper);
 //*************************************************************************************
 
+
 // GLTF loader
 let model;
 const assetLoader = new GLTFLoader();
+const objectsToTest = []; // Store objects for raycasting
+
 assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
     const model = gltf.scene;
     model.position.set(0, 0, 0);
     model.traverse(function(node) {
-        if (node.isMesh) node.castShadow = true; //cast shadows
+        if (node.isMesh) {
+            node.castShadow = true; //cast shadows
+            objectsToTest.push(node); // Add monitor to raycasting list
+        }
     });
 
     scene.add(model);
@@ -69,7 +75,10 @@ assetLoader.load('./assets/desk.glb', function(gltf) { //import desk asset
     const model = gltf.scene;
     model.position.set(0, 0, 0);
     model.traverse(function(node) {
-        if (node.isMesh) node.receiveShadow = true; //receive shadows
+        if (node.isMesh) {
+            node.receiveShadow = true; //receive shadows
+            objectsToTest.push(node); // Add desk to raycasting list
+        }
     });
 
     scene.add(model);
@@ -82,8 +91,11 @@ assetLoader.load('./assets/desk.glb', function(gltf) { //import desk asset
 const mousePosition = new THREE.Vector2();
 window.addEventListener('mousemove', function(e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mousePosition.y = - (e.clientY / window.innerHeight) * 2 + 1;
+    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
 });
+
+// Raycaster for detecting objects
+const raycaster = new THREE.Raycaster();
 
 // Variables to store camera rotation
 let yaw = 0; // Horizontal rotation
@@ -94,7 +106,29 @@ const sensitivityX = 0.7;
 const sensitivityY = 0.7;
 
 // Rotation limits for pitch (up/down)
-const maxPitch = 0.5; // 45 degrees up/down
+const maxPitch = 0.5; // 180 degrees up/down
+
+// Function to perform raycasting
+let hoveredObject = null; // Store the currently hovered object
+function raycast() {
+    raycaster.setFromCamera(mousePosition, camera);
+    const intersects = raycaster.intersectObjects(objectsToTest, true);
+
+    if (intersects.length > 0) {
+        hoveredObject = intersects[0].object; // Store currently hovered object
+        console.log("Hovering over:", hoveredObject.name || "Unnamed Object"); //DEBUG
+    } else {
+        hoveredObject = null; // Reset hovered object if nothing is intersected
+    }
+}
+
+// Event listener for mouse click
+window.addEventListener('click', function() {
+    if (hoveredObject && hoveredObject.name === "screen") {
+        console.log("Clicked on the screen!");
+        // Add any additional actions you want to perform on click
+    }
+});
 
 // Animate scene
 function animate() {
@@ -111,6 +145,9 @@ function animate() {
     camera.rotation.order = 'YXZ'; // Use YXZ order for yaw/pitch rotation
     camera.rotation.y = yaw; // Horizontal (yaw)
     camera.rotation.x = pitch; // Vertical (pitch)
+
+    // Perform raycasting to detect hovered objects
+    raycast();
 
     // Render scene with updated camera rotation
     renderer.render(scene, camera);
