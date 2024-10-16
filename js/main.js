@@ -55,7 +55,7 @@ let model;
 const assetLoader = new GLTFLoader();
 const objectsToTest = []; // Store objects for raycasting
 
-assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
+assetLoader.load('./assets/monitor3.glb', function(gltf) { //import monitor asset
     const model = gltf.scene;
     model.position.set(0, 0, 0);
     model.traverse(function(node) {
@@ -71,7 +71,24 @@ assetLoader.load('./assets/monitor.glb', function(gltf) { //import monitor asset
     console.error(error);
 });
 
-assetLoader.load('./assets/desk.glb', function(gltf) { //import desk asset
+assetLoader.load('./assets/desk2.glb', function(gltf) { //import desk asset
+    const model = gltf.scene;
+    model.position.set(0, 0, 0);
+    model.traverse(function(node) {
+        if (node.isMesh) {
+            node.receiveShadow = true; //receive shadows
+            node.castShadow = true; //cast shadows
+            objectsToTest.push(node); // Add desk to raycasting list
+        }
+    });
+
+    scene.add(model);
+    
+}, undefined, function(error) {
+    console.error(error);
+});
+
+assetLoader.load('./assets/cave.glb', function(gltf) { //import desk asset
     const model = gltf.scene;
     model.position.set(0, 0, 0);
     model.traverse(function(node) {
