@@ -1,6 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Pathway+Gothic+One&display=swap');
 
+/* CSS for the fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0; /* Start with opacity 0 */
+    }
+    to {
+        opacity: 1; /* End with opacity 1 */
+    }
+}
+
 body {
+    animation: fadeIn 2s ease; /* Apply the fade-in animation */
     display: grid;
     grid-template-areas:
         "header"  /* Header area */
